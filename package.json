@@ -5,7 +5,6 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
-    "ejs": "2.3.4",
     "grunt": "1.0.1",
     "grunt-contrib-clean": "1.0.0",
     "grunt-contrib-coffee": "1.0.0",
@@ -33,5 +32,8 @@
     "url": "git://github.com/andrew/arangodb_ru_doc.git"
   },
   "author": "andrew",
-  "license": ""
+  "license": "",
+  "devDependencies": {
+    "jade": "^1.11.0"
+  }
 }
