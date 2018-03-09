@@ -34,7 +34,19 @@ module.exports.routes = {
 
   '/': {
     view: 'homepage'
-  }
+  },
+
+  '/aql/introduction': {
+    view: 'aql/introduction'
+  },
+
+  '/aql/tutorial': {
+    view: 'aql/tutorial'
+  }, 
+
+  '/aql/aql-tutorial/crud': {
+    view: 'aql/aql-tutorial/crud'
+  }, 
 
   /***************************************************************************
   *                                                                          *
