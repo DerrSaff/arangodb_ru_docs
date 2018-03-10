@@ -48,6 +48,10 @@ module.exports.routes = {
     view: 'aql/aql-tutorial/crud'
   }, 
 
+  '/aql/aql-tutorial/filter': {
+    view: 'aql/aql-tutorial/filter'
+  }, 
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
