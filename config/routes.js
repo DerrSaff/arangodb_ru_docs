@@ -52,6 +52,10 @@ module.exports.routes = {
     view: 'aql/aql-tutorial/filter'
   }, 
 
+  '/aql/aql-tutorial/sort-limit': {
+    view: 'aql/aql-tutorial/sort-limit'
+  }, 
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
