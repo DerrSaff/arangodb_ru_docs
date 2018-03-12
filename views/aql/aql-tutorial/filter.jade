@@ -1,7 +1,12 @@
-aside
+extends ../../layout.jade
+
+block title
+  title Отбор документов
+
+block sidebar
   include ../../partials/aql-sidebar.jade
 
-main
+block content
   :marked
     # Отбор документов
 
@@ -24,7 +29,7 @@ main
       RETURN c
     ```
 
-    ## Range conditions
+    ## Операторы сравнения
 
     Строгое соответствие - это одно из возможных условий. Однако существует ряд других условий, которые мы можем использовать. Например, мы могли бы найти всех персонажей старше 12 лет:
  
