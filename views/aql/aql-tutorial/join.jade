@@ -1,0 +1,258 @@
+extends ../../layout.jade
+
+block title
+  title JOIN-операции
+
+block sidebar
+  include ../../partials/aql-sidebar.jade
+
+block content
+  :marked
+    ## Отсылки к другим документам
+
+    Данные персонажей, которые мы импортировали, имеют атрибут "характеристика" для каждого персонажа, являющийся массивом из строк. Однако сохраняются не сами характеристики:
+
+    ```js
+    {
+      "name": "Ned",
+      "surname": "Stark",
+      "alive": false,
+      "age": 41,
+      "traits": ["A","H","C","N","P"]
+    }
+    ```
+
+    Это просто набор букв без определённого смысла. Идея состоит в том, чтобы этот атрибут хранил ключи документов другой коллекции, котоорые мы могли бы использовать, чтобы превратить символы в слова по типу "сильный". Преимущество в использовании другой коллекции состоит в том, чтобы мы могли позже запросить все существующие характеристики и хранить слова на нескольких языках в каком-то одном месте. Если бы мы использовали словесные представления характеристик...
+
+    ```js
+    {
+      "name": "Ned",
+      "surname": "Stark",
+      "alive": false,
+      "age": 41,
+      "traits": [
+        {
+            "de": "stark",
+            "en": "strong"
+        },
+        {
+            "de": "einflussreich",
+            "en": "powerful"
+        },
+        {
+            "de": "loyal",
+            "en": "loyal"
+        },
+        {
+            "de": "rational",
+            "en": "rational"
+        },
+        {
+            "de": "mutig",
+            "en": "brave"
+        }
+      ]
+    }
+    ```
+
+    ...то было бы сложно работать с характеристиками. Если бы понадобилось переименовать или перевести одну из них, вы должны были бы найти все документы персонажей с одинаковой характеристикой и выполнить там изменения. Если мы ссылаемся на характеристику в другой коллекции, нужно всего лишь отредактировать один документ.
+
+  <img src="/images/Comparison_DataModels.png">
+
+  :marked
+    ## Импортирование характеристик
+
+    Ниже вы найдете данные с характеристиками. Следуйте по шаблону, как это было в <a href="/aql/aql-tutorial/crud#create_documents">создании документов</a>, и импортируйте их:
+
+    * Создать коллекцию документов Traits (Характеристики)
+    * Присвойте данные переменной в AQL, <pre>LET data = [ ... ]</pre>
+    * Используйте цикл FOR для итерации по каждому элементу массива данных
+    * Вставьте элемент в коллекцию: INSERT element INTO Traits
+
+  <img src="/images/Traits_Collection_Creation.png">
+    
+  :marked
+    ```js
+    [
+      { "_key": "A", "en": "strong", "de": "stark" },
+      { "_key": "B", "en": "polite", "de": "freundlich" },
+      { "_key": "C", "en": "loyal", "de": "loyal" },
+      { "_key": "D", "en": "beautiful", "de": "schön" },
+      { "_key": "E", "en": "sneaky", "de": "hinterlistig" },
+      { "_key": "F", "en": "experienced", "de": "erfahren" },
+      { "_key": "G", "en": "corrupt", "de": "korrupt" },
+      { "_key": "H", "en": "powerful", "de": "einflussreich" },
+      { "_key": "I", "en": "naive", "de": "naiv" },
+      { "_key": "J", "en": "unmarried", "de": "unverheiratet" },
+      { "_key": "K", "en": "skillful", "de": "geschickt" },
+      { "_key": "L", "en": "young", "de": "jung" },
+      { "_key": "M", "en": "smart", "de": "klug" },
+      { "_key": "N", "en": "rational", "de": "rational" },
+      { "_key": "O", "en": "ruthless", "de": "skrupellos" },
+      { "_key": "P", "en": "brave", "de": "mutig" },
+      { "_key": "Q", "en": "mighty", "de": "mächtig" },
+      { "_key": "R", "en": "weak", "de": "schwach" }
+    ]
+    ```
+
+    ## Получение характеристик
+    Давайте начнём с получения атрибута характеристик каждого персонажа:
+
+    ```js
+    FOR c IN Characters
+        RETURN c.traits
+    ```
+
+    ```js    
+    [
+        { "traits": ["A","H","C","N","P"] },
+        { "traits": ["D","H","C"] },
+        ...
+    ]
+    ```
+
+    Также смотрите <a href="#">Основы документов / объектов</a> о доступе к атрибутам.
+
+    Мы можем использовать массив характеристик вместе с функцией DOCUMENT(), чтобы использовать элементы как ключи документов и искать их в коллекции Traits.
+
+    ```js  
+    FOR c IN Characters
+      RETURN DOCUMENT("Traits", c.traits)
+    ```
+
+    ```js  
+    [
+      [
+        {
+          "_key": "A",
+          "_id": "Traits/A",
+          "_rev": "_V5oRUS2---",
+          "en": "strong",
+          "de": "stark"
+        },
+        {
+          "_key": "H",
+          "_id": "Traits/H",
+          "_rev": "_V5oRUS6--E",
+          "en": "powerful",
+          "de": "einflussreich"
+        },
+        {
+          "_key": "C",
+          "_id": "Traits/C",
+          "_rev": "_V5oRUS6--_",
+          "en": "loyal",
+          "de": "loyal"
+        },
+        {
+          "_key": "N",
+          "_id": "Traits/N",
+          "_rev": "_V5oRUT---D",
+          "en": "rational",
+          "de": "rational"
+        },
+        {
+          "_key": "P",
+          "_id": "Traits/P",
+          "_rev": "_V5oRUTC---",
+          "en": "brave",
+          "de": "mutig"
+        }
+      ],
+      [
+        {
+          "_key": "D",
+          "_id": "Traits/D",
+          "_rev": "_V5oRUS6--A",
+          "en": "beautiful",
+          "de": "schön"
+        },
+        {
+          "_key": "H",
+          "_id": "Traits/H",
+          "_rev": "_V5oRUS6--E",
+          "en": "powerful",
+          "de": "einflussreich"
+        },
+        {
+          "_key": "C",
+          "_id": "Traits/C",
+          "_rev": "_V5oRUS6--_",
+          "en": "loyal",
+          "de": "loyal"
+        }
+      ],
+      ...
+    ]
+    ```
+    Получили слишком много информации, поэтому вернём только английские слова, используя расширенную нотацию массива.
+
+    ```js
+    FOR c IN Characters
+        RETURN DOCUMENT("Traits", c.traits)[*].en
+    ```
+
+    ```js
+    [
+      [
+        "strong",
+        "powerful",
+        "loyal",
+        "rational",
+        "brave"
+      ],
+      [
+        "beautiful",
+        "powerful",
+        "loyal"
+      ],
+      ...
+    ]
+    ```
+
+    ## Объединение символов и характеристик
+
+    Отлично, мы привели символы к осмысленным словам. Но мы также должны узнать, к какому персонажу они принадлежат.Поэтому мы должны объединить документы персонажей и данные из документа с характеристиками:
+
+    ```js
+    FOR c IN Characters
+        RETURN MERGE(c, { traits: DOCUMENT("Traits", c.traits)[*].en } )
+    ```
+
+    ```js
+    [
+      {
+        "_id": "Characters/2861650",
+        "_key": "2861650",
+        "_rev": "_V1bzsXa---",
+        "age": 41,
+        "alive": false,
+        "name": "Ned",
+        "surname": "Stark",
+        "traits": [
+          "strong",
+          "powerful",
+          "loyal",
+          "rational",
+          "brave"
+        ]
+      },
+      {
+        "_id": "Characters/2861653",
+        "_key": "2861653",
+        "_rev": "_V1bzsXa--B",
+        "age": 40,
+        "alive": false,
+        "name": "Catelyn",
+        "surname": "Stark",
+        "traits": [
+          "beautiful",
+          "powerful",
+          "loyal"
+        ]
+      },
+      ...
+    ]
+    ```
+
+    Функция MERGE() объединяет объекты. Так как мы использвоали объект { traits: ... }, который имеет такое же имя атрибута, как и имя атрибута персонажа, последний перезаписывается при слиянии.
