@@ -60,6 +60,10 @@ module.exports.routes = {
     view: 'aql/aql-tutorial/join'
   }, 
 
+  '/aql/aql-tutorial/traversal': {
+    view: 'aql/aql-tutorial/traversal'
+  }, 
+
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
